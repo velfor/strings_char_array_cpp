@@ -1,10 +1,12 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
-#include <cstring>
-#include <cctype>
+#include <string>
 #include <windows.h>
+#include <algorithm>
+#include <sstream>
+
 using namespace std;
-bool isEnglishWord(const char* str) {
+bool isEnglishWord(string str) {
     for (int i = 0; str[i] != '\0'; i++) {
         if (!((str[i] >= 'a' && str[i] <= 'z') || (str[i] >= 'A' && str[i] <= 'Z'))) {
             return false;
@@ -16,54 +18,41 @@ bool isEnglishWord(const char* str) {
 int main() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
-    char input[100];
-    std::cin.getline(input, sizeof(input));
+    string input;
+    getline(cin,input);
 
-    const size_t maxWordLength = 20;
     const size_t maxWordsNumber = 10;
-    char englishWords[maxWordsNumber][maxWordLength] = { '\0', '\0' ,'\0' ,'\0' ,'\0' ,'\0' ,'\0' ,'\0' ,'\0' ,'\0' };
-    char otherWords[maxWordsNumber][maxWordLength] = { '\0', '\0' ,'\0' ,'\0' ,'\0' ,'\0' ,'\0' ,'\0' ,'\0' ,'\0' };
+    string englishWords[maxWordsNumber];
+    string otherWords[maxWordsNumber];
 
+    //разбиение на слова
     size_t wordIndex = 0;
-    
-
-    char* currentWord = strtok(input, " ,.;:-?!");
-    while (currentWord != nullptr) {
-        if (isEnglishWord(currentWord)) {
-            strcpy(englishWords[wordIndex], currentWord);
-            
+    stringstream ss(input);
+    string token;
+    while (std::getline(ss, token, ' ') || std::getline(ss, token, ',') 
+        || std::getline(ss, token, '!') || std::getline(ss, token, '?')) 
+    {
+        if (isEnglishWord(token)) {
+            englishWords[wordIndex] = token;
         }
         else {
-            strcpy(otherWords[wordIndex], currentWord);
+            otherWords[wordIndex] = token;
         }
-        ++wordIndex;
-        currentWord = strtok(nullptr, " ,.;:-?!");
+        wordIndex++;
     }
-    //сортировка пузырьком массива английских слов
-    for (size_t i = 0; i < maxWordsNumber - 1; i++) {
-        bool swapped = false;
-        for (size_t j = 0; j < maxWordsNumber - i - 1; j++) {
-            if (englishWords[j][0] == '\0') { // проверяем, является ли текущий элемент пустой строкой
-                continue; // пропускаем пустую строку
-            }
-            if (strcmp(englishWords[j], englishWords[j + 1]) > 0) {
-                char temp[maxWordLength];
-                strcpy_s(temp, englishWords[j]);
-                strcpy_s(englishWords[j], englishWords[j + 1]);
-                strcpy_s(englishWords[j + 1], temp);
-                swapped = true;
-            }
-        }
-        if (!swapped) {
-            break;
-        }
-    }
+    //сортировка 
+    
+    
     for (int i = 0; i < maxWordsNumber; i++) {
         cout << i << ' ' << englishWords[i] << endl;
     }
+    for (int i = 0; i < maxWordsNumber; i++) {
+        cout << i << ' ' << otherWords[i] << endl;
+    }
+
 
     int eIndex = 0;
     int oIndex = 0;
-    
+
     return 0;
 }
